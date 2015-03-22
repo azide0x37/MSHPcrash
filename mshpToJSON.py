@@ -2,6 +2,8 @@ import urllib2
 from bs4 import BeautifulSoup
 from collections import OrderedDict
 import json
+import pandas as pd
+
 """
 class dlData:
     def __init__(self):
@@ -87,6 +89,7 @@ for tr in rows:
 #    print row
 
 formatted = json.dumps(dataset, indent=4, separators=(',',':'))
-print formatted
+#print formatted
+print pd.DataFrame(dataset)
 
 
