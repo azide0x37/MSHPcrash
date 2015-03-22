@@ -53,6 +53,7 @@ table = datasoup.find('table', summary="Table listing details of the accident.")
 
 rows = table.findAll('tr')
 
+#TODO: Pull col_names ftom the table headngs
 col_names = ['Name', 'Age', 'Hometown', 'Severity', 'Date', 'Time', 'County', 'Location', 'Troop']
 
 dataset = []
@@ -63,33 +64,18 @@ for tr in rows:
     row_data = OrderedDict()
     counter = 0
 
+    #TODO: the zeroth element of cols is null; why? Fix.
     for td in cols[1:]:
-        #if counter == 0:
-            #continue
-        #print td
         text = ''.join(td.find(text=True))
-        #print text# + ",",
-
         try:
             row_data[col_names[counter]] = text
             counter += 1
         except:
             counter = 0
             continue
-    
-    """
-    try:
-        row_data.pop(0)
-    except:
-        continue
-    """
+
     dataset.append(row_data)
-    #print
-#for row in dataset:
-#    print row
 
 formatted = json.dumps(dataset, indent=4, separators=(',',':'))
 #print formatted
 print pd.DataFrame(dataset)
-
-
