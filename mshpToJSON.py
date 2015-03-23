@@ -5,10 +5,10 @@ import json
 import pandas as pd
 
 class mshpScraper:
-    def __init__(self, url = 'http://www.mshp.dps.missouri.gov/HP68/search.jsp' colNames = ['Name', 'Age', 'Hometown', 'Severity', 'Date', 'Time', 'County', 'Location', 'Troop']))
-        
+    def __init__(self, url = 'http://www.mshp.dps.missouri.gov/HP68/search.jsp' colNames = ['Name', 'Age', 'Hometown', 'Severity', 'Date', 'Time', 'County', 'Location', 'Troop'])
         self.url = url
         self.colNames = colNames
+    
     def __str__(self):
         try:
             return self.url
