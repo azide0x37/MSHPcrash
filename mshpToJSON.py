@@ -5,7 +5,8 @@ import json
 import pandas as pd
 
 class mshpScraper:
-    def __init__(self, url = 'http://www.mshp.dps.missouri.gov/HP68/search.jsp' colNames = ['Name', 'Age', 'Hometown', 'Severity', 'Date', 'Time', 'County', 'Location', 'Troop'])
+    
+    def __init__(self, url = 'http://www.mshp.dps.missouri.gov/HP68/search.jsp', colNames=['Name', 'Age', 'Hometown', 'Severity', 'Date', 'Time', 'County', 'Location', 'Troop']):
         self.url = url
         self.colNames = colNames
     
@@ -21,35 +22,43 @@ class mshpScraper:
         #Use a proper useragent to evade the anti-hack software
         opener.addheaders = [('User-agent', 'Mozilla/5.0')]
         response = opener.open(self.url)
-        webpageSouped = BeautifulSoup(response.read())
+        webpage = response.read()
+        webpageSouped = BeautifulSoup(webpage)
 
-        #This is the particular table with the data we need. Find a better way to pick the right one?
-        table = datasoup.find('table', summary="Table listing details of the accident.")
+        #This is the particular table with the data we need.
+        #TODO: Find a better way to pick the right one?
+        table = webpageSouped.find('table', summary="Table listing details of the accident.")
         rows = table.findAll('tr')
 
-        #TODO: Pull col_names ftom the table headngs
+        #TODO: Pull colNames ftom the table headngs
         dataset = []
         
         for tr in rows:
             cols = tr.findAll('td')
-            #print cols
             row_data = OrderedDict()
             counter = 0
 
-        #TODO: the zeroth element of cols is null; why? Fix.
-        for td in cols[1:]:
-            text = ''.join(td.find(text=True))
-            try:
-                row_data[self.colNames[counter]] = text
-                counter += 1
-            except:
-                counter = 0
-                continue
-
-        dataset.append(row_data)
+            #TODO: the zeroth element of cols is null; why? Fix.
+            for td in cols[1:]:
+                text = ''.join(td.find(text=True))
+                try:
+                    row_data[self.colNames[counter]] = text
+                    counter += 1
+                except:
+                    counter = 0
+                    continue
+            dataset.append(row_data)
 
         formatted = json.dumps(dataset, indent=4, separators=(',', ':'))
         #print formatted
         return pd.DataFrame(dataset)
 
-print mshpScraper()
+myScrape = mshpScraper()
+#adding __call__ method allows me to call the instance as a function! Neat!
+#TODO: find out if this is a good or bad practice
+
+dfScrape = pd.DataFrame(myScrape())
+
+#print dfScrape.sum(axis = 2)
+#print dfScrape.mean(axis = 2)
+print dfScrape
