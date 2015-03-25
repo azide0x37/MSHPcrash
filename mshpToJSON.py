@@ -14,8 +14,6 @@ class mshpScraper:
         self.url = url
         self.colNames = colNames
     
-
-
     def __str__(self):
         try:
             return self.url
@@ -55,17 +53,12 @@ class mshpScraper:
                     counter = 0
                     continue
             dataset.append(row_data)
-
-        formatted = json.dumps(dataset, indent=4, separators=(',', ':'))
-        #print formatted
-        return pd.DataFrame(dataset)
-
+        
+        #Pretty Print JSON for testing
+        #formatted = json.dumps(dataset, indent=4, separators=(',', ':'))
+        return json.dumps(dataset)
+"""
+#Class usage template
 myScrape = mshpScraper()
-#adding __call__ method allows me to call the instance as a function! Neat!
-#TODO: find out if this is a good or bad practice
-
-dfScrape = pd.DataFrame(myScrape())
-
-#print dfScrape.sum(axis = 2)
-#print dfScrape.mean(axis = 2)
-print dfScrape
+myScrape()
+"""
