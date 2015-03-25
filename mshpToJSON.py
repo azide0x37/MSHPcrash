@@ -6,10 +6,16 @@ import pandas as pd
 
 class mshpScraper:
     
-    def __init__(self, url = 'http://www.mshp.dps.missouri.gov/HP68/search.jsp', colNames=['Name', 'Age', 'Hometown', 'Severity', 'Date', 'Time', 'County', 'Location', 'Troop']):
+    def __init__(self,
+            url = 'http://www.mshp.dps.missouri.gov/HP68/SearchAction', 
+            colNames = ['Name', 'Age', 'Hometown', 'Severity', 'Date', 'Time', 'County', 'Location', 'Troop']), 
+            county = 'Jefferson'):
+        
         self.url = url
         self.colNames = colNames
     
+
+
     def __str__(self):
         try:
             return self.url
@@ -19,6 +25,7 @@ class mshpScraper:
     def __call__(self):
         opener = urllib2.build_opener()
         
+
         #Use a proper useragent to evade the anti-hack software
         opener.addheaders = [('User-agent', 'Mozilla/5.0')]
         response = opener.open(self.url)
