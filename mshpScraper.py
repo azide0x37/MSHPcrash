@@ -55,7 +55,8 @@ class mshpScraper:
             return self.url
         except:
             print "Unable to print url." 
-
+    
+    #Setting this default method allows one to call an instance like a function. NEATO!
     def __call__(self):
         webpageSouped = BeautifulSoup(self.response.read())
 
@@ -64,7 +65,7 @@ class mshpScraper:
         table = webpageSouped.find('table', summary="Table listing details of the accident.")
         rows = table.findAll('tr')
 
-        #TODO: Pull colNames ftom the table headngs
+        #TODO: Pull colNames from the table headngs
         dataset = []
         
         for tr in rows:
@@ -83,7 +84,7 @@ class mshpScraper:
                     continue
             dataset.append(row_data)
 
-        #Convert dataset (List of Dicts) to pandas Dataframe
+        #Convert dataset (List of Dicts) to pandas DataFrame
         #Extract date and time colums to column of dateTime objects, then drop
         returnData = pd.DataFrame(dataset)
         returnData['DateTime'] = returnData.apply(lambda row datetime(row['Date'], row['Time'], axis = 1)
