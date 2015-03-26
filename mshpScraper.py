@@ -2,6 +2,7 @@
 mshpScraper.py 
 Missouri State Highway Patrol scraper for crash data!
 [azide0x37] Alexander Templeton (nepenthe.me)
+
 Arguments: 
     Production:
         optional: 
@@ -27,6 +28,7 @@ from bs4 import BeautifulSoup
 from collections import OrderedDict
 import json
 import pandas as pd
+import numpy as np
 from datetime import datetime
 from geopy.geocoders import Nominatim
 
@@ -35,7 +37,7 @@ class mshpScraper:
     def __init__(
                 self,
                 url = 'http://www.mshp.dps.missouri.gov/HP68/SearchAction', 
-                colNames = ['Name', 'Age', 'Hometown', 'Severity', 'Date', 'Time', 'County', 'Location', 'Troop']), 
+                colNames = ['Name', 'Age', 'Hometown', 'Severity', 'Date', 'Time', 'County', 'Location', 'Troop'], 
                 county = 'Jefferson'):
         
         self.url = url
@@ -49,6 +51,9 @@ class mshpScraper:
         #TODO: Add __call__ option to redownload 
         self.response = opener.open(self.url)
 
+        pd.set_option('display.max_rows', 500)
+        pd.set_option('display.max_columns', 500)
+        pd.set_option('display.width', 200)
     
     def __str__(self):
         try:
@@ -86,15 +91,30 @@ class mshpScraper:
 
         #Convert dataset (List of Dicts) to pandas DataFrame
         #Extract date and time colums to column of dateTime objects, then drop
+        
+        def datetimeCoerce(row):
+            return datetime(row['Date'], axis = 1)
+        
         returnData = pd.DataFrame(dataset)
-        returnData['DateTime'] = returnData.apply(lambda row datetime(row['Date'], row['Time'], axis = 1)
-        returnData = returnData.drop(['Date', 'Time'], 1)
+        #returnData['DateTime'] = returnData.apply(lambda row: datetimeCoerce(row))
+        
+        #FIXME drop these unused columns
+        #returnData.drop('Date', 1, inplace = True)
 
+        #FIXME this doesn't work at all
+        
         #Location coersion
-        geolocator = Nominatim()
-        returnData['Location'] = returnData.apply(lambda row geolocator.geocode(row.Location + ", " + row.County + " County, MO"))
-        returnData['Latitude'] = returnData.apply(lambda row geolocator.geocode(row['Location']).latitude)
-        returnData['Longitude'] = returnData.apply(lambda row geolocator.geocode(row['Location']).longitude)
+        #geolocator = geopy.geocoders.OpenMapQuest()
+
+        #location = geolocator.geocode(returnData['Location'])
+        
+        #returnData['Location'] = returnData.apply(lambda row: geolocator.geocode(row.Location + ", " + row.County + " County, MO"))
+        #returnData['Latitude'] = returnData.apply(lambda row: geolocator.geocode(row['Location']).latitude)
+        #returnData['Longitude'] = returnData.apply(lambda row: geolocator.geocode(row['Location']).longitude)
+        
 
         #Ship it!
-        return returnData
+        return returnData[pd.notnull(returnData['Name'])]
+
+myScrape = mshpScraper()
+print myScrape()
