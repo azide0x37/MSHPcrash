@@ -24,13 +24,11 @@ myScrape()
 """
 
 import urllib2
+import geopy
+import pandas as pd
 from bs4 import BeautifulSoup
 from collections import OrderedDict
-import json
-import pandas as pd
-import numpy as np
 from datetime import datetime
-from geopy.geocoders import Nominatim
 
 class mshpScraper:
     
@@ -50,7 +48,8 @@ class mshpScraper:
         #Cache our response
         #TODO: Add __call__ option to redownload 
         self.response = opener.open(self.url)
-
+    
+        #Set better formatting for testing console print
         pd.set_option('display.max_rows', 500)
         pd.set_option('display.max_columns', 500)
         pd.set_option('display.width', 200)
