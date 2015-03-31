@@ -68,14 +68,13 @@ class mshpScraper:
         #TODO: Find a better way to pick the right one?
         table = webpageSouped.find('table', summary="Table listing details of the accident.")
         rows = table.findAll('tr')
-
-        #TODO: Pull colNames from the table headngs
+        
         dataset = []
         
         for tr in rows:
             cols = tr.findAll('td')
             row_data = OrderedDict()
-            counter = 0
+            counter = 1
 
             #TODO: the zeroth element of cols is null; why? Fix.
             for td in cols[1:]:
