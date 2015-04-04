@@ -26,6 +26,7 @@ myScrape()
 import urllib2
 import geopy
 import pandas as pd
+from sklearn_pandas import DataFrameMapper
 from bs4 import BeautifulSoup
 from collections import OrderedDict
 from datetime import datetime
@@ -116,4 +117,6 @@ class mshpScraper:
         return returnData[pd.notnull(returnData['Name'])]
 
 myScrape = mshpScraper()
-print myScrape()
+data = myScrape()
+mapper = DataFrameMapper([
+    '', sklearn.preprocessing.
