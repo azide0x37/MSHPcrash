@@ -46,7 +46,6 @@ class mshpScraper:
         opener.addheaders = [('User-agent', 'Mozilla/5.0')]
         
         #Cache our response
-        #TODO: Add __call__ option to redownload 
         self.response = opener.open(self.url)
     
         #Set better formatting for testing console print
@@ -61,7 +60,11 @@ class mshpScraper:
             print "Unable to print url." 
     
     #Setting this default method allows one to call an instance like a function. NEATO!
-    def __call__(self):
+    def __call__(self, refreshCache = False):
+        
+        if refreshCache:
+            self.__init__()
+        
         webpageSouped = BeautifulSoup(self.response.read())
 
         #This is the particular table with the data we need.
