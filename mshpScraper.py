@@ -121,4 +121,10 @@ class mshpScraper:
 myScrape = mshpScraper()
 data = myScrape()
 mapper = DataFrameMapper([
-    '', sklearn.preprocessing.
+    ('Age', sklearn.preprocessing.StandardScaler())
+    ('Hometown', sklearn.preprocessing.LabelBinarizer())
+    ('Severity', sklearn.preprocessing.LabelBinarizer())
+    ('County', sklearn.preprocessing.LabelBinarizer())
+    ('Troop', sklearn.preprocessing.LabelBinarizer())])
+    
+print np.round(mapper.fit_transform(data), 2)
