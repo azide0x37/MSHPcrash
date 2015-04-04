@@ -117,7 +117,11 @@ class mshpScraper:
         #returnData['Latitude'] = returnData.apply(lambda row: geolocator.geocode(row['Location']).latitude)
         #returnData['Longitude'] = returnData.apply(lambda row: geolocator.geocode(row['Location']).longitude)
         
-        returnData = returnData.drop(, axis=1)
+        returnData = returnData.drop('Name', axis=1)
+        returnData = returnData.drop('Hometown', axis=1)
+        returnData = returnData.drop('Date', axis=1)
+        returnData = returnData.drop('Time', axis=1)
+        returnData = returnData.drop('Location', axis=1)
         #Ship it!
         return returnData
 
@@ -125,7 +129,6 @@ myScrape = mshpScraper()
 data = myScrape()
 mapper = DataFrameMapper([
     ('Age', sklearn.preprocessing.StandardScaler()),
-    ('Hometown', sklearn.preprocessing.LabelBinarizer()),
     ('Severity', sklearn.preprocessing.LabelBinarizer()),
     ('County', sklearn.preprocessing.LabelBinarizer()),
     ('Troop', sklearn.preprocessing.LabelBinarizer())
