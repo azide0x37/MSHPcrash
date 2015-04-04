@@ -47,7 +47,6 @@ class mshpScraper:
         opener.addheaders = [('User-agent', 'Mozilla/5.0')]
         
         #Cache our response
-        #TODO: Add __call__ option to redownload 
         self.response = opener.open(self.url)
     
         #Set better formatting for testing console print
@@ -62,21 +61,24 @@ class mshpScraper:
             print "Unable to print url." 
     
     #Setting this default method allows one to call an instance like a function. NEATO!
-    def __call__(self):
+    def __call__(self, refreshCache = False):
+        
+        if refreshCache:
+            self.__init__()
+        
         webpageSouped = BeautifulSoup(self.response.read())
 
         #This is the particular table with the data we need.
         #TODO: Find a better way to pick the right one?
         table = webpageSouped.find('table', summary="Table listing details of the accident.")
         rows = table.findAll('tr')
-
-        #TODO: Pull colNames from the table headngs
+        
         dataset = []
         
         for tr in rows:
             cols = tr.findAll('td')
             row_data = OrderedDict()
-            counter = 0
+            counter = 1
 
             #TODO: the zeroth element of cols is null; why? Fix.
             for td in cols[1:]:
