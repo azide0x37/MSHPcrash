@@ -26,6 +26,8 @@ myScrape()
 import urllib2
 import geopy
 import pandas as pd
+import numpy as np
+import sklearn.preprocessing, sklearn.decomposition, sklearn.linear_model, sklearn.pipeline, sklearn.metrics
 from sklearn_pandas import DataFrameMapper
 from bs4 import BeautifulSoup
 from collections import OrderedDict
@@ -38,7 +40,7 @@ class mshpScraper:
                 url = 'http://www.mshp.dps.missouri.gov/HP68/SearchAction', 
                 colNames = ['Name', 'Age', 'Hometown', 'Severity', 'Date', 'Time', 'County', 'Location', 'Troop'], 
                 county = 'Jefferson'):
-        
+
         self.url = url
         self.colNames = colNames
         
@@ -96,7 +98,8 @@ class mshpScraper:
         
         def datetimeCoerce(row):
             return datetime(row['Date'], axis = 1)
-        
+
+
         returnData = pd.DataFrame(dataset)
         #returnData['DateTime'] = returnData.apply(lambda row: datetimeCoerce(row))
         
@@ -114,17 +117,18 @@ class mshpScraper:
         #returnData['Latitude'] = returnData.apply(lambda row: geolocator.geocode(row['Location']).latitude)
         #returnData['Longitude'] = returnData.apply(lambda row: geolocator.geocode(row['Location']).longitude)
         
-
+        returnData = returnData.drop(, axis=1)
         #Ship it!
-        return returnData[pd.notnull(returnData['Name'])]
+        return returnData
 
 myScrape = mshpScraper()
 data = myScrape()
 mapper = DataFrameMapper([
-    ('Age', sklearn.preprocessing.StandardScaler())
-    ('Hometown', sklearn.preprocessing.LabelBinarizer())
-    ('Severity', sklearn.preprocessing.LabelBinarizer())
-    ('County', sklearn.preprocessing.LabelBinarizer())
-    ('Troop', sklearn.preprocessing.LabelBinarizer())])
+    ('Age', sklearn.preprocessing.StandardScaler()),
+    ('Hometown', sklearn.preprocessing.LabelBinarizer()),
+    ('Severity', sklearn.preprocessing.LabelBinarizer()),
+    ('County', sklearn.preprocessing.LabelBinarizer()),
+    ('Troop', sklearn.preprocessing.LabelBinarizer())
+    ])
     
 print np.round(mapper.fit_transform(data), 2)
