@@ -3,19 +3,6 @@ mshpScraper.py
 Missouri State Highway Patrol scraper for crash data!
 [azide0x37] Alexander Templeton (nepenthe.me)
 
-Arguments: 
-    Production:
-        optional: 
-            date:
-            name:
-            county:
-            severity:
-            age_of_occupant:
-            
-    Devel:
-        optional: 
-            url: of webpage
-    
 Returns: pandas Data.Frame object
 
 Class usage template
@@ -24,14 +11,16 @@ myScrape()
 """
 
 import urllib2
-import geopy
+import sklearn.preprocessing, sklearn.decomposition, sklearn.linear_model, sklearn.pipeline, sklearn.metrics
+
 import pandas as pd
 import numpy as np
-import sklearn.preprocessing, sklearn.decomposition, sklearn.linear_model, sklearn.pipeline, sklearn.metrics
-from sklearn_pandas import DataFrameMapper
+
 from bs4 import BeautifulSoup
-from collections import OrderedDict
 from datetime import datetime
+from collections import OrderedDict
+from sklearn_pandas import DataFrameMapper, cross_val_score
+
 
 class mshpScraper:
     
@@ -94,41 +83,16 @@ class mshpScraper:
             dataset.append(row_data)
 
         #Convert dataset (List of Dicts) to pandas DataFrame
-        #Extract date and time colums to column of dateTime objects, then drop
-        
-        def datetimeCoerce(row):
-            return datetime(row['Date'], axis = 1)
-
-
         returnData = pd.DataFrame(dataset)
-        #returnData['DateTime'] = returnData.apply(lambda row: datetimeCoerce(row))
+        returnData = returnData.drop(['Name', 'Hometown', 'Date', 'Time', 'Location'], axis=1)
         
-        #FIXME drop these unused columns
-        #returnData.drop('Date', 1, inplace = True)
-
-        #FIXME this doesn't work at all
-        
-        #Location coersion
-        #geolocator = geopy.geocoders.OpenMapQuest()
-
-        #location = geolocator.geocode(returnData['Location'])
-        
-        #returnData['Location'] = returnData.apply(lambda row: geolocator.geocode(row.Location + ", " + row.County + " County, MO"))
-        #returnData['Latitude'] = returnData.apply(lambda row: geolocator.geocode(row['Location']).latitude)
-        #returnData['Longitude'] = returnData.apply(lambda row: geolocator.geocode(row['Location']).longitude)
-        
-        returnData = returnData.drop('Name', axis=1)
-        returnData = returnData.drop('Hometown', axis=1)
-        returnData = returnData.drop('Date', axis=1)
-        returnData = returnData.drop('Time', axis=1)
-        returnData = returnData.drop('Location', axis=1)
         #Ship it!
         return returnData
 
 myScrape = mshpScraper()
 data = myScrape()
 mapper = DataFrameMapper([
-    ('Age', sklearn.preprocessing.StandardScaler()),
+    ('Age', sklearn.preprocessing.OneHotEncoder()),
     ('Severity', sklearn.preprocessing.LabelBinarizer()),
     ('County', sklearn.preprocessing.LabelBinarizer()),
     ('Troop', sklearn.preprocessing.LabelBinarizer())
