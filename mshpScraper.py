@@ -28,7 +28,7 @@ import geopy
 import pandas as pd
 import numpy as np
 import sklearn.preprocessing, sklearn.decomposition, sklearn.linear_model, sklearn.pipeline, sklearn.metrics
-from sklearn_pandas import DataFrameMapper
+from sklearn_pandas import DataFrameMapper, cross_val_score
 from bs4 import BeautifulSoup
 from collections import OrderedDict
 from datetime import datetime
@@ -80,7 +80,7 @@ class mshpScraper:
         for tr in rows:
             cols = tr.findAll('td')
             row_data = OrderedDict()
-            counter = 1
+            counter = 0
 
             #TODO: the zeroth element of cols is null; why? Fix.
             for td in cols[1:]:
@@ -123,6 +123,7 @@ class mshpScraper:
         returnData = returnData.drop('Time', axis=1)
         returnData = returnData.drop('Location', axis=1)
         #Ship it!
+        print returnData
         return returnData
 
 myScrape = mshpScraper()
@@ -135,3 +136,8 @@ mapper = DataFrameMapper([
     ])
     
 print np.round(mapper.fit_transform(data), 2)
+pipe = sklearn.pipeline.Pipeline([
+    ('featurize', mapper),
+    ('lm', sklearn.linear_model.LinearRegression())
+    ])
+print np.round(cross_val_score(pipe, data, [34, 'Jefferson', 'Fatal', 'C'], 'r2'), 2)
