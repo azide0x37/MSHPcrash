@@ -4,8 +4,11 @@
 #[azide0x37] Alexander Templeton (nepenthe.me)
 """
 import requests
-import datetime
-from dateutil import parser
+import datetime as dt
+import json
+from dateutil import parser as psr
+
+from time import sleep
 from bs4 import BeautifulSoup
 from collections import OrderedDict 
 import numpy as np
@@ -56,8 +59,46 @@ class mshpScraper:
                     counter = 0
         
         #Attempt to coerce date and time to datetime and remove originals
-        _dataset['Datetime'] = [datetime.datetime.combine(parser.parse(_dataset['Date'][row]).date(), parser.parse(_dataset['Time'][row]).time()) for row in range(len(_dataset['Date']))]        
+        _dataset['Datetime'] = [dt.datetime.combine(psr.parse(_dataset['Date'][row]).date(), psr.parse(_dataset['Time'][row]).time()) for row in range(len(_dataset['Date']))]        
         #Formatted test print
         #print [datetime.datetime.strftime(_dataset['Datetime'][i], "%c") for i in range(len(_dataset['Date']))]
+        
+        #Attempt to determine coordinates from approximate address
+        #TODO: Is this data manipulation useful?
+        response = requests.get("https://michele-zonca-google-geocoding.p.mashape.com/geocode/json?address=MO-6+AND+ROUTE+F+AT+JAMESPORT&sensor=true",
+                               headers={"X-Mashape-Key": "143jwvHjaFmshwlsIWWgs21EMbOFp1meDr6jsnmRPcrUFcpfap", "Accept": "application/json"})
+        print "Latitude:", response.json()['results'][0]['geometry']['location']['lat'], "Longitude:", response.json()['results'][0]['geometry']['location']['lng']
+        #print _dataset['Location']
+        latitudes = []        
+        totalAddresses = 0
+        parsedAddresses = 0
+        blank = []
+        
+        #Merge fuzzy location with county and state data
+        _dataset['Location'] = [_dataset['Location'][n] + _dataset['County'][n] + "County, MO" for n in range(len(_dataset['Location']))]
+            
+        for fuzzyAddress in _dataset['Location']:
+            addressResponse = requests.get("https://michele-zonca-google-geocoding.p.mashape.com/geocode/json?address=" + fuzzyAddress.replace(" ","+") + "&sensor=true", headers = {"X-Mashape-Key": "143jwvHjaFmshwlsIWWgs21EMbOFp1meDr6jsnmRPcrUFcpfap", "Accept": "application/json"})
+            #print addressResponse.json()['results']#[0]['geometry']['location']['lat']
+            #sleep(0.1) 
+            totalAddresses += 1
+            try:
+                blank.append(addressResponse.json()['results'][0]['geometry']['location']['lat'])
+                parsedAddresses += 1
+            except:
+                print addressResponse.json(), "for address", fuzzyAddress
+                continue
+        print parsedAddresses, "/", totalAddresses, "addresses converted."
+        print blank
+            
+        _dataset['Latitude'] = latitudes
+        #print _dataset['Latitude']
+        
+        
+        
         #Ship it!
-        return _dataset
+        return np.array(_dataset)
+
+myScrape = mshpScraper()
+data = myScrape()
+#print data
